@@ -112,6 +112,7 @@ fun RegistrationScreen() {
 
 }
 
+//preview para la pantalla registration
 @Preview(showBackground = true)
 @Composable
 fun RegistrationScreenPreview() {
