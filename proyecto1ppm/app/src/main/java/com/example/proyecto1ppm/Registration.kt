@@ -14,9 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-
+import androidx.compose.ui.unit.sp
 
 
 class RegistrationActivity : ComponentActivity() {
@@ -49,11 +50,18 @@ fun RegistrationScreen() {
     ) {
         // Agregar la imagen en el centro superior
         Image(
-            painter = painterResource(id = R.drawable.graduacion),
+            painter = painterResource(id = R.drawable.gorro_graduacion),
             contentDescription = null,
             modifier = Modifier
-                .size(100.dp)
-                .padding(bottom = 16.dp)
+                .size(200.dp)
+                .padding(bottom = 0.dp)
+        )
+        Text(
+            text = "StudyMatch",
+            color = Color.White,
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
         )
 
         TextField(
