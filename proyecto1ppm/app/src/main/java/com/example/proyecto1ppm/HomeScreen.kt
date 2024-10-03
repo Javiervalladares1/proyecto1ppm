@@ -99,7 +99,7 @@ fun HomeScreen(navController: NavController) {
 
         // Información del Curso (placeholder)
         Text(
-            text = "Curso de Ejemplo",
+            text = "Cálculo",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth(),

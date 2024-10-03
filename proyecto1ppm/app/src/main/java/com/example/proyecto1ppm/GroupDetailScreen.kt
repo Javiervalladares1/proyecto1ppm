@@ -9,7 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment // Importamos el paquete correcto para Alignment
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -78,7 +78,7 @@ fun GroupDetailsScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Sección de Temas Abordados (placeholder)
+        // Sección de Temas Abordados
         Text(
             text = "Temas Abordados",
             fontSize = 18.sp,
@@ -92,7 +92,7 @@ fun GroupDetailsScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Apartado de reuniones de Zoom (placeholder)
+        // Apartado de reuniones de Zoom
         Text(
             text = "Reuniones",
             fontSize = 18.sp,
@@ -110,7 +110,7 @@ fun GroupDetailsScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botones de acciones (sin lógica)
+        // Primera fila de botones de acción
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -121,14 +121,26 @@ fun GroupDetailsScreen(navController: NavController) {
             Button(onClick = { /* Agregar miembro */ }) {
                 Text("Agregar Miembro")
             }
-            Button(onClick = { /* Salir del grupo */ }, colors = ButtonDefaults.buttonColors(Color.Red)) {
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Segunda fila: Botón de "Salir del Grupo" en una fila aparte
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center // Centramos el botón rojo
+        ) {
+            Button(
+                onClick = { /* Salir del grupo */ },
+                colors = ButtonDefaults.buttonColors(Color.Red)
+            ) {
                 Text("Salir del Grupo")
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Mensajes recientes o publicaciones (placeholder)
+        // Mensajes recientes o publicaciones
         Text(
             text = "Mensajes Recientes",
             fontSize = 18.sp,
