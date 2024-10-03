@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -20,6 +21,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.proyecto1ppm.ui.theme.Proyecto1ppmTheme
 
 
@@ -28,14 +31,14 @@ class SplashScreenActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         setContent {
             Proyecto1ppmTheme() {
-                SplashScreen()
+                SplashScreen(navController = rememberNavController())
             }
         }
     }
 }
 
 @Composable
-fun SplashScreen() {
+fun SplashScreen(navController: NavController) {
     // Fondo con una imagen que cubre toda la pantalla
     Box(
         modifier = Modifier
@@ -80,6 +83,12 @@ fun SplashScreen() {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(top = 16.dp)
             )
+            LaunchedEffect(Unit) {
+                kotlinx.coroutines.delay(3000L) // Simula 3 segundos de delay
+                navController.navigate("registration_screen") {
+                    popUpTo("splash_screen") { inclusive = true }
+                }
+            }
         }
     }
 }
@@ -88,6 +97,6 @@ fun SplashScreen() {
 @Composable
 fun SplashScreenPreview() {
     Proyecto1ppmTheme() {
-        SplashScreen()
+        SplashScreen(navController = rememberNavController())
     }
 }

@@ -1,6 +1,7 @@
 package com.example.proyecto1ppm
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -18,26 +19,29 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun GroupDetailsScreen(group: StudyGroup, onBackClick: () -> Unit) {
-    // Habilitamos el scroll vertical con rememberScrollState
+fun GroupDetailsScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()) // Hacemos la columna scrollable
-            .padding(16.dp) // Añadimos padding a todo el contenido
+            .verticalScroll(rememberScrollState())
+            .padding(16.dp)
     ) {
         // Encabezado con botón de regresar
         Row(
             modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically // Se usa correctamente ahora
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-            }
+            Icon(
+                imageVector = Icons.Default.ArrowBack,
+                contentDescription = "Back",
+                modifier = Modifier.clickable { navController.navigate("home_screen") }
+            )
             Text(
-                text = group.title,
+                text = "Curso de Ejemplo",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.fillMaxWidth(),
@@ -49,8 +53,8 @@ fun GroupDetailsScreen(group: StudyGroup, onBackClick: () -> Unit) {
 
         // Imagen de portada del grupo
         Image(
-            painter = painterResource(group.image),
-            contentDescription = group.title,
+            painter = painterResource(R.drawable.house), // Imagen genérica
+            contentDescription = "Imagen del Curso",
             contentScale = ContentScale.Crop,
             modifier = Modifier
                 .fillMaxWidth()
@@ -66,7 +70,7 @@ fun GroupDetailsScreen(group: StudyGroup, onBackClick: () -> Unit) {
             fontWeight = FontWeight.SemiBold
         )
         Text(
-            text = group.description,
+            text = "Esta es una descripción genérica para el curso de ejemplo.",
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
             textAlign = TextAlign.Justify
@@ -74,21 +78,21 @@ fun GroupDetailsScreen(group: StudyGroup, onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Sección de Temas Abordados
+        // Sección de Temas Abordados (placeholder)
         Text(
             text = "Temas Abordados",
             fontSize = 18.sp,
             fontWeight = FontWeight.SemiBold
         )
         Column {
-            group.topics.forEach { topic ->
+            listOf("Tema 1", "Tema 2", "Tema 3").forEach { topic ->
                 Text(text = "- $topic", fontSize = 16.sp)
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Apartado de reuniones de Zoom
+        // Apartado de reuniones de Zoom (placeholder)
         Text(
             text = "Reuniones",
             fontSize = 18.sp,
@@ -106,7 +110,7 @@ fun GroupDetailsScreen(group: StudyGroup, onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Botones de acciones
+        // Botones de acciones (sin lógica)
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
@@ -124,7 +128,7 @@ fun GroupDetailsScreen(group: StudyGroup, onBackClick: () -> Unit) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Mensajes recientes o publicaciones dentro del grupo
+        // Mensajes recientes o publicaciones (placeholder)
         Text(
             text = "Mensajes Recientes",
             fontSize = 18.sp,
@@ -150,26 +154,8 @@ fun GroupDetailsScreen(group: StudyGroup, onBackClick: () -> Unit) {
     }
 }
 
-// Datos del grupo y vista previa
-data class StudyGroup( // Cambié el nombre a StudyGroup para evitar conflictos
-    val title: String,
-    val description: String,
-    val image: Int, // Int es correcto si estas imágenes existen en drawable
-    val members: List<Int>, // Int es correcto para los IDs de recursos de imágenes en drawable
-    val topics: List<String>
-)
-
 @Preview(showBackground = true)
 @Composable
 fun PreviewGroupDetailsScreen() {
-    val group = StudyGroup( // Aquí también cambié a StudyGroup
-        title = "Cálculo Diferencial",
-        description = "Este grupo es para discutir y resolver ejercicios de Cálculo Diferencial. " +
-                "Es un lugar donde los estudiantes pueden colaborar y ayudarse mutuamente " +
-                "para mejorar sus habilidades y conocimientos en el curso.",
-        image = R.drawable.house,  // Asegúrate de que esta imagen existe en tu carpeta res/drawable
-        members = listOf(R.drawable.house, R.drawable.house, R.drawable.house, R.drawable.house),  // Lo mismo para los avatares
-        topics = listOf("Límites", "Derivadas", "Integrales", "Aplicaciones de Derivadas")
-    )
-    GroupDetailsScreen(group = group, onBackClick = { /* Navigate back */ })
+    GroupDetailsScreen(navController = rememberNavController() )
 }

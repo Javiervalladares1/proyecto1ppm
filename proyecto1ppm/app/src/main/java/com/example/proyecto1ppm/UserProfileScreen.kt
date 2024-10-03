@@ -26,9 +26,11 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 @Composable
-fun UserProfileScreen() {
+fun UserProfileScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,7 +40,7 @@ fun UserProfileScreen() {
         Icon(
             imageVector = Icons.Default.Menu,
             contentDescription = "Menu",
-            modifier = Modifier.clickable { /* Abrir el menú */ }
+            modifier = Modifier.clickable { navController.navigate("slide_menu_screen") }
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -131,6 +133,6 @@ fun AssignedCourses(courses: List<String>) {
 @Composable
 fun UserProfileScreenPreview() {
     Proyecto1ppmTheme {
-        UserProfileScreen()
+        UserProfileScreen(navController = rememberNavController())
     }
 }

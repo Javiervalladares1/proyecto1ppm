@@ -21,6 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 data class Group(
     val title: String,
@@ -32,8 +34,7 @@ data class Group(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeScreen(groups: List<Group>) {
-    var selectedGroup by remember { mutableStateOf(groups[0]) }
+fun HomeScreen(navController: NavController) {
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Bar
@@ -42,7 +43,7 @@ fun HomeScreen(groups: List<Group>) {
                 Text("SUGERENCIA DE CURSOS", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             },
             navigationIcon = {
-                IconButton(onClick = { /* Open menu */ }) {
+                IconButton(onClick = {  navController.navigate("slide_menu_screen") }) {
                     Icon(Icons.Default.Menu, contentDescription = "Menu")
                 }
             },
@@ -62,7 +63,8 @@ fun HomeScreen(groups: List<Group>) {
             )
             Tab(
                 selected = false,
-                onClick = { /* Switch to Grupos */ },
+                onClick = {
+                    navController.navigate("group_detail_screen") },
                 text = { Text("Grupos") }
             )
             Tab(
@@ -74,17 +76,17 @@ fun HomeScreen(groups: List<Group>) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Carrusel de Cursos
+        // Carrusel de Cursos (sin datos, solo placeholder)
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(groups) { group ->
+            items(3) { // Simulamos 3 items de ejemplo
                 Image(
-                    painter = painterResource(group.image),
-                    contentDescription = group.title,
+                    painter = painterResource(R.drawable.house), // Imagen genérica
+                    contentDescription = "Curso",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(180.dp)
@@ -95,9 +97,9 @@ fun HomeScreen(groups: List<Group>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Información del Curso Seleccionado
+        // Información del Curso (placeholder)
         Text(
-            text = selectedGroup.title,
+            text = "Curso de Ejemplo",
             fontSize = 22.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.fillMaxWidth(),
@@ -106,23 +108,19 @@ fun HomeScreen(groups: List<Group>) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Sección de Avatares y Botones "Join Group" y "Create New Group"
+        // Sección de Avatares y Botones "Join Group" y "Create New Group" (sin lógica)
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 32.dp),
-            horizontalArrangement = Arrangement.SpaceAround, // Espaciado uniforme
+            horizontalArrangement = Arrangement.SpaceAround,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Columna de Avatares y "Join Group"
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                // Avatares de Miembros
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 LazyRow {
-                    items(selectedGroup.members) { memberImage ->
+                    items(3) { // Simulamos 3 avatares de ejemplo
                         Image(
-                            painter = painterResource(memberImage),
+                            painter = painterResource(R.drawable.house),
                             contentDescription = "Member Avatar",
                             modifier = Modifier
                                 .size(40.dp)
@@ -132,7 +130,6 @@ fun HomeScreen(groups: List<Group>) {
                     }
                 }
 
-                // "Join Group" Button
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
@@ -142,10 +139,7 @@ fun HomeScreen(groups: List<Group>) {
                 }
             }
 
-            // Columna de "Create New Group"
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Icon(painterResource(R.drawable.house), contentDescription = "Create New Group", modifier = Modifier.size(24.dp))
                 Text("Create new group", color = Color.Blue, fontSize = 14.sp)
             }
@@ -153,9 +147,9 @@ fun HomeScreen(groups: List<Group>) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Descripción del Curso
+        // Descripción del Curso (placeholder)
         Text(
-            text = selectedGroup.description,
+            text = "Esta es una descripción del curso de ejemplo.",
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
             modifier = Modifier.fillMaxWidth(),
@@ -167,29 +161,5 @@ fun HomeScreen(groups: List<Group>) {
 @Preview(showBackground = true)
 @Composable
 fun PreviewHomeScreen() {
-    val groups = listOf(
-        Group(
-            title = "Cálculo Diferencial",
-            description = "Aquí va una breve descripción del curso",
-            image = R.drawable.house,
-            members = listOf(R.drawable.house, R.drawable.house, R.drawable.house),
-            topics = listOf("Límites", "Derivadas", "Integrales", "Aplicaciones de Derivadas")
-        ),
-        Group(
-            title = "Química General",
-            description = "Aquí va una breve descripción del curso",
-            image = R.drawable.house,
-            members = listOf(R.drawable.house, R.drawable.house, R.drawable.house),
-            topics = listOf("Límites", "Derivadas", "Integrales", "Aplicaciones de Derivadas")
-        ),
-        Group(
-            title = "Física Universitaria",
-            description = "Aquí va una breve descripción del curso",
-            image = R.drawable.house,
-            members = listOf(R.drawable.house, R.drawable.house, R.drawable.house),
-            topics = listOf("Límites", "Derivadas", "Integrales", "Aplicaciones de Derivadas")
-        )
-    )
-
-    HomeScreen(groups)
+    HomeScreen( navController = rememberNavController())
 }

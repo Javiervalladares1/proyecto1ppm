@@ -23,19 +23,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 class SlideMenuScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             Proyecto1ppmTheme() {
-                SlideMenuScreen()
+                SlideMenuScreen(navController = rememberNavController())
             }
         }
     }
 }
 @Composable
-fun SlideMenuScreen() {
+fun SlideMenuScreen(navController: NavController) {
     Row(modifier = Modifier.fillMaxSize()) {
         // Menú deslizante (morado)
         Box(
@@ -50,11 +52,17 @@ fun SlideMenuScreen() {
             ) {
                 // Opciones del menú
                 Column {
-                    MenuItem(text = "CURSOS", onClick = { /* Acción */ })
-                    MenuItem(text = "GRUPOS", onClick = { /* Acción */ })
+                    MenuItem(text = "CURSOS", onClick = {
+                        navController.navigate("home_screen") // Ir a HomeScreen
+                    })
+                    MenuItem(text = "GRUPOS", onClick = {
+                        navController.navigate("group_detail_screen") // Ir a GroupDetailScreen
+                    })
                     MenuItem(text = "SUGERENCIAS", onClick = { /* Acción */ })
-                    MenuItem(text = "AJUSTES", onClick = { /* Acción */ })
-                    MenuItem(text = "CERRAR SESIÓN", onClick = { /* Acción */ })
+                    MenuItem(text = "AJUSTES", onClick = {
+                        navController.navigate("user_profile_screen") // Ir a UserProfileScreen
+                    })
+                    MenuItem(text = "CERRAR SESIÓN", onClick = { /* Acción de cerrar sesión */ })
                 }
 
                 // Imagen del usuario y nombre
@@ -108,6 +116,6 @@ fun MenuItem(text: String, onClick: () -> Unit) {
 @Composable
 fun SlideMenuScreenPreview() {
     Proyecto1ppmTheme() {
-        SlideMenuScreen()
+        SlideMenuScreen(navController = rememberNavController())
     }
 }

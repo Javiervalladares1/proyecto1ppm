@@ -18,20 +18,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 
 
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            RegistrationScreen()
+            RegistrationScreen(navController = rememberNavController())
         }
     }
 }
 
 
 @Composable
-fun RegistrationScreen() {
+fun RegistrationScreen(navController: NavController) {
     var email by remember { mutableStateOf("email") }
     var password by remember { mutableStateOf("password") }
     var interests by remember { mutableStateOf("interests") }
@@ -110,8 +112,8 @@ fun RegistrationScreen() {
                 Text("Registrarse")
             }
             Button(onClick = {
-                // Aquí igual podemos usar Retrofit para lo mismo
-                println("Iniciar Sesión: Email: $email, Password: $password")
+                navController.navigate("home_screen")
+
             }) {
                 Text("Iniciar Sesión")
             }
@@ -124,5 +126,5 @@ fun RegistrationScreen() {
 @Preview(showBackground = true)
 @Composable
 fun RegistrationScreenPreview() {
-    RegistrationScreen()
+    RegistrationScreen(navController = rememberNavController())
 }

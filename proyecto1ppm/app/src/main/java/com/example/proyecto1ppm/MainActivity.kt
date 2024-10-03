@@ -1,47 +1,54 @@
 package com.example.proyecto1ppm
-
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.example.proyecto1ppm.ui.theme.Proyecto1ppmTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
         setContent {
             Proyecto1ppmTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
-                        modifier = Modifier.padding(innerPadding)
-                    )
-                }
+                AppNavigation()
             }
         }
     }
 }
 
 @Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
+fun AppNavigation() {
+    val navController = rememberNavController()
 
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    Proyecto1ppmTheme {
-        Greeting("Android")
+
+    NavHost(navController = navController, startDestination = "splash_screen") {
+        // Splash Screen
+        composable("splash_screen") {
+            SplashScreen(navController = navController)
+        }
+        // Registration Screen
+        composable("registration_screen") {
+            RegistrationScreen(navController = navController)
+        }
+        // Home Screen
+        composable("home_screen") {
+            HomeScreen(navController = navController)
+        }
+        // Group Detail Screen
+        composable("group_detail_screen") {
+            GroupDetailsScreen(navController = navController)
+        }
+        // User Profile Screen
+        composable("user_profile_screen") {
+            UserProfileScreen(navController = navController)
+        }
+        // Slide Menu Screen
+        composable("slide_menu_screen") {
+            SlideMenuScreen(navController = navController)
+        }
     }
 }
