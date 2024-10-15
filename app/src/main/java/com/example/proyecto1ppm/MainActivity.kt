@@ -34,6 +34,11 @@ fun AppNavigation() {
         composable("registration_screen") {
             RegistrationScreen(navController = navController)
         }
+
+        // Login Screen
+        composable("login_screen") {
+            LoginScreen(navController = navController)
+        }
         // Home Screen
         composable("home_screen") {
             HomeScreen(navController = navController)
@@ -51,8 +56,9 @@ fun AppNavigation() {
             SlideMenuScreen(navController = navController)
         }
 
-    }
 
+
+    }
 
 }
 

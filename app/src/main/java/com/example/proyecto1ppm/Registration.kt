@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -40,7 +41,6 @@ class RegistrationActivity : ComponentActivity() {
         }
     }
 }
-
 @Composable
 fun RegistrationScreen(navController: NavController) {
     var email by remember { mutableStateOf("") }
@@ -49,7 +49,7 @@ fun RegistrationScreen(navController: NavController) {
     var institution by remember { mutableStateOf("") }
     var fullName by remember { mutableStateOf("") }
 
-    Column(
+    LazyColumn(
         modifier = Modifier
             .background(Color(0xFF6A1B9A))
             .fillMaxSize()
@@ -57,66 +57,120 @@ fun RegistrationScreen(navController: NavController) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Image(
-            painter = painterResource(id = R.drawable.gorro_graduacion),
-            contentDescription = null,
-            modifier = Modifier.size(200.dp)
-        )
-        Text(
-            text = "StudyMatch",
-            color = Color.White,
-            fontSize = 36.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = interests,
-            onValueChange = { interests = it },
-            label = { Text("Areas of study/Interests") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = institution,
-            onValueChange = { institution = it },
-            label = { Text("University/Institution") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = fullName,
-            onValueChange = { fullName = it },
-            label = { Text("Full Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            println("Registrarse: Email: $email, Password: $password")
-        }) {
-            Text("Registrarse")
+        item {
+            // Imagen en el centro superior
+            Image(
+                painter = painterResource(id = R.drawable.gorro_graduacion),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(200.dp) // Ajustar tamaño de la imagen
+                    .padding(bottom = 8.dp)
+            )
         }
-        Spacer(modifier = Modifier.height(8.dp))
-        TextButton(onClick = {
-            navController.navigate("login_screen")
-        }) {
-            Text("¿Ya tienes una cuenta? Inicia sesión", color = Color.White)
+
+        item {
+            Text(
+                text = "StudyMatch",
+                color = Color.White,
+                fontSize = 30.sp, // Ajustar el tamaño del texto
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
+        item {
+            TextField(
+                value = email,
+                onValueChange = { email = it },
+                label = { Text("Email") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Box(modifier = Modifier.height(8.dp)) // Espacio entre elementos
+        }
+
+        item {
+            TextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Contraseña") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Box(modifier = Modifier.height(8.dp)) // Espacio entre elementos
+        }
+
+        item {
+            TextField(
+                value = interests,
+                onValueChange = { interests = it },
+                label = { Text("Areas de interés/estudio") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Box(modifier = Modifier.height(8.dp)) // Espacio entre elementos
+        }
+
+        item {
+            TextField(
+                value = institution,
+                onValueChange = { institution = it },
+                label = { Text("Universidad/Institución") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Box(modifier = Modifier.height(8.dp)) // Espacio entre elementos
+        }
+
+        item {
+            TextField(
+                value = fullName,
+                onValueChange = { fullName = it },
+                label = { Text("Nombre Completo ") },
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+
+        item {
+            Box(modifier = Modifier.height(16.dp)) // Espacio más grande antes del botón
+        }
+
+        item {
+            Button(onClick = {
+                println("Registrarse: Email: $email, Password: $password")
+                navController.navigate("home_screen")
+            }) {
+                Text("Registrarse")
+            }
+        }
+
+        item {
+            Box(modifier = Modifier.height(16.dp)) // Espacio más grande antes del texto de login
+        }
+
+        item {
+            TextButton(onClick = {
+                navController.navigate("login_screen")
+            }) {
+                Text(
+                    "¿Ya tienes una cuenta? Inicia sesión",
+                    color = Color.White,
+                    fontSize = 14.sp
+                )
+            }
         }
     }
 }
+
+
 
 @Composable
 fun LoginScreen(navController: NavController) {
@@ -148,20 +202,22 @@ fun LoginScreen(navController: NavController) {
         TextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Contaseña") },
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(16.dp))
         Button(onClick = {
             println("Iniciar Sesión: Email: $email, Password: $password")
+            navController.navigate("home_screen")
         }) {
             Text("Iniciar Sesión")
+
         }
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(2.dp))
         TextButton(onClick = {
             navController.navigate("registration_screen")
         }) {
-            Text("¿No tienes una cuenta? Regístrate", color = Color.White)
+            Text("¿No tienes una cuenta? Regístrate", color = Color.White, fontSize = 14.sp)
         }
     }
 }
