@@ -1,9 +1,8 @@
-package com.example.proyecto1ppm
+package com.example.proyecto1ppm.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -23,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.proyecto1ppm.R
 
 data class Group(
     val title: String,

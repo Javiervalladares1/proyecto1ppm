@@ -1,4 +1,4 @@
-package com.example.proyecto1ppm
+package com.example.proyecto1ppm.screen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -15,12 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-
+import com.example.proyecto1ppm.R
+import com.google.firebase.auth.FirebaseAuth
 
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,16 +31,12 @@ class RegistrationActivity : ComponentActivity() {
     }
 }
 
-
 @Composable
 fun RegistrationScreen(navController: NavController) {
-    var email by remember { mutableStateOf("email") }
-    var password by remember { mutableStateOf("password") }
-    var interests by remember { mutableStateOf("interests") }
-    var institution by remember { mutableStateOf("institution") }
-    var fullName by remember { mutableStateOf("fullName") }
-
-
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) } // Mostrar mensaje de error si el login falla
+    val auth = FirebaseAuth.getInstance()
 
     Column(
         modifier = Modifier
@@ -66,6 +62,7 @@ fun RegistrationScreen(navController: NavController) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
+        // Campo de texto para el email
         TextField(
             value = email,
             onValueChange = { email = it },
@@ -73,58 +70,69 @@ fun RegistrationScreen(navController: NavController) {
             modifier = Modifier.fillMaxWidth()
         )
         Spacer(modifier = Modifier.height(8.dp))
+
+        // Campo de texto para la contraseña
         TextField(
             value = password,
             onValueChange = { password = it },
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth()
         )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = interests,
-            onValueChange = { interests = it },
-            label = { Text("Areas of study/Interests") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = institution,
-            onValueChange = { institution = it },
-            label = { Text("University/Institution") },
-            modifier = Modifier.fillMaxWidth()
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-        TextField(
-            value = fullName,
-            onValueChange = { fullName = it },
-            label = { Text("Full Name") },
-            modifier = Modifier.fillMaxWidth()
-        )
         Spacer(modifier = Modifier.height(16.dp))
+
+        // Mensaje de error (si es necesario)
+        errorMessage?.let {
+            Text(
+                text = it,
+                color = Color.Red,
+                modifier = Modifier.padding(8.dp)
+            )
+        }
+
+        // Botones para Registro y Login
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             Button(onClick = {
-                // Aquí podemos usar Retrofit para llamar a una API y validar datos
-                println("Registrarse: Email: $email, Password: $password")
+                // Registrar el usuario en Firebase Authentication
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    auth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                println("Registro exitoso con email: $email")
+                                // Navegar al perfil del usuario
+                                navController.navigate("user_profile_screen")
+                            } else {
+                                errorMessage = "Error en el registro: ${task.exception?.message}"
+                            }
+                        }
+                } else {
+                    errorMessage = "Por favor, rellena todos los campos"
+                }
             }) {
                 Text("Registrarse")
             }
-            Button(onClick = {
-                navController.navigate("home_screen")
 
+            Button(onClick = {
+                // Iniciar sesión con Firebase Authentication
+                if (email.isNotEmpty() && password.isNotEmpty()) {
+                    auth.signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            if (task.isSuccessful) {
+                                println("Inicio de sesión exitoso con email: $email")
+                                // Navegar a la pantalla de inicio (home_screen)
+                                navController.navigate("home_screen")
+                            } else {
+                                errorMessage = "Error en el inicio de sesión: ${task.exception?.message}"
+                            }
+                        }
+                } else {
+                    errorMessage = "Por favor, rellena todos los campos"
+                }
             }) {
                 Text("Iniciar Sesión")
             }
         }
     }
-
-}
-
-//preview para la pantalla registration
-@Preview(showBackground = true)
-@Composable
-fun RegistrationScreenPreview() {
-    RegistrationScreen(navController = rememberNavController())
 }

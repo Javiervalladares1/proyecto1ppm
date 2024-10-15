@@ -1,4 +1,4 @@
-package com.example.proyecto1ppm
+package com.example.proyecto1ppm.screen
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.proyecto1ppm.R
 
 class SlideMenuScreenActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {

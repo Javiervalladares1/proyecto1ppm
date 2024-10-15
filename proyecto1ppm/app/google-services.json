@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "136512183889",
+    "project_id": "proyecto-ppm-studymatch",
+    "storage_bucket": "proyecto-ppm-studymatch.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136512183889:android:d1ffd132b21407280ce270",
+        "android_client_info": {
+          "package_name": "com.example.proyecto1ppm"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAXOTgT_SnB216jZ29cJBvpzShg5MTpzD0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

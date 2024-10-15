@@ -1,8 +1,4 @@
-package com.example.proyecto1ppm
-
-import com.example.proyecto1ppm.ui.theme.Proyecto1ppmTheme
-
-
+package com.example.proyecto1ppm.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,14 +19,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.proyecto1ppm.R
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun UserProfileScreen(navController: NavController) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -71,18 +69,11 @@ fun UserProfileScreen(navController: NavController) {
         // Detalles del perfil
         Text(text = "Detalles Personales", fontWeight = FontWeight.Bold, fontSize = 20.sp)
 
-        // Campos de datos del usuario
-        UserDetailField(label = "Email", value = "abcdefg@gmail.com", isPassword = false)
+        UserDetailField(label = "Email", value = currentUser?.email ?: "", isPassword = false)
         ChangeOptionText("Change Email")
 
         UserDetailField(label = "Password", value = "************", isPassword = true)
         ChangeOptionText("Change Password")
-
-        UserDetailField(label = "Full Name", value = "Harry Truman", isPassword = false)
-        ChangeOptionText("Change Name")
-
-        UserDetailField(label = "University", value = "University", isPassword = false)
-        ChangeOptionText("Change University")
 
         Spacer(modifier = Modifier.height(16.dp))
 
@@ -113,7 +104,7 @@ fun UserDetailField(label: String, value: String, isPassword: Boolean = false) {
 fun ChangeOptionText(option: String) {
     Text(
         text = option,
-        color = Color(0xFF673AB7), // Texto morado
+        color = Color(0xFF673AB7),
         modifier = Modifier
             .clickable { /* Acción para cambiar */ }
             .padding(8.dp)
@@ -126,13 +117,5 @@ fun AssignedCourses(courses: List<String>) {
         courses.forEach { course ->
             Text(text = course, modifier = Modifier.padding(4.dp))
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun UserProfileScreenPreview() {
-    Proyecto1ppmTheme {
-        UserProfileScreen(navController = rememberNavController())
     }
 }

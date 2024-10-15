@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -61,6 +62,13 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.runtime.ktx)
     implementation(libs.androidx.navigation.compose)
+    //<Firebase SDK dependencies>
+        implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+        implementation("com.google.firebase:firebase-auth")
+        implementation("com.google.firebase:firebase-firestore")
+//<Firebase SDK dependencies/>
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

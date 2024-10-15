@@ -1,4 +1,4 @@
-package com.example.proyecto1ppm
+package com.example.proyecto1ppm.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
+import com.example.proyecto1ppm.R
 
 @Composable
 fun GroupDetailsScreen(navController: NavController) {

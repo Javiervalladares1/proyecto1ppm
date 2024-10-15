@@ -3,10 +3,15 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
-import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.proyecto1ppm.screen.GroupDetailsScreen
+import com.example.proyecto1ppm.screen.HomeScreen
+import com.example.proyecto1ppm.screen.RegistrationScreen
+import com.example.proyecto1ppm.screen.SlideMenuScreen
+import com.example.proyecto1ppm.screen.SplashScreen
+import com.example.proyecto1ppm.screen.UserProfileScreen
 import com.example.proyecto1ppm.ui.theme.Proyecto1ppmTheme
 
 class MainActivity : ComponentActivity() {
