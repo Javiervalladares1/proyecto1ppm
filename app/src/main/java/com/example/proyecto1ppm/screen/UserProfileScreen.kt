@@ -1,8 +1,6 @@
-package com.example.proyecto1ppm
-
-import com.example.proyecto1ppm.ui.theme.Proyecto1ppmTheme
 
 
+package com.example.proyecto1ppm.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -12,8 +10,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -23,20 +22,38 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
+import com.example.proyecto1ppm.R
+import com.google.firebase.auth.FirebaseAuth
+import coil.compose.rememberAsyncImagePainter
+import com.example.proyecto1ppm.utils.getUserFullName
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun UserProfileScreen(navController: NavController) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    var fullName by remember { mutableStateOf("") }
+    var avatarUrl by remember { mutableStateOf("") }
+
+    LaunchedEffect(Unit) {
+        getUserFullName { name ->
+            fullName = name
+            if (name.isNotEmpty()) {
+                // Construct the avatar URL using the API
+                avatarUrl = "https://avatar.iran.liara.run/username?username=${name.replace(" ", "")}"
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        // Icono de menú hamburguesa
+        // Menu Icon
         Icon(
             imageVector = Icons.Default.Menu,
             contentDescription = "Menu",
@@ -45,7 +62,7 @@ fun UserProfileScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Título "Perfil"
+        // Title
         Text(
             text = "Perfil",
             fontSize = 24.sp,
@@ -55,40 +72,53 @@ fun UserProfileScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Imagen de perfil
-        Image(
-            painter = painterResource(id = R.drawable.house),
-            contentDescription = "Profile Image",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .size(100.dp)
-                .clip(CircleShape)
-                .align(Alignment.CenterHorizontally)
+        // Profile Image
+        if (avatarUrl.isNotEmpty()) {
+            Image(
+                painter = rememberAsyncImagePainter(avatarUrl),
+                contentDescription = "Profile Image",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .align(Alignment.CenterHorizontally)
+            )
+        } else {
+            // Placeholder
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .clip(CircleShape)
+                    .background(Color.Gray)
+                    .align(Alignment.CenterHorizontally)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Personal Details
+        Text(
+            text = "Detalles Personales",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        UserDetailField(label = "Nombre Completo", value = fullName)
+        UserDetailField(label = "Email", value = currentUser?.email ?: "")
+        ChangeOptionText("Cambiar Email")
 
-        // Detalles del perfil
-        Text(text = "Detalles Personales", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-
-        // Campos de datos del usuario
-        UserDetailField(label = "Email", value = "abcdefg@gmail.com", isPassword = false)
-        ChangeOptionText("Change Email")
-
-        UserDetailField(label = "Password", value = "************", isPassword = true)
-        ChangeOptionText("Change Password")
-
-        UserDetailField(label = "Full Name", value = "Harry Truman", isPassword = false)
-        ChangeOptionText("Change Name")
-
-        UserDetailField(label = "University", value = "University", isPassword = false)
-        ChangeOptionText("Change University")
+        UserDetailField(label = "Contraseña", value = "************", isPassword = true)
+        ChangeOptionText("Cambiar Contraseña")
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Cursos asignados
-        Text(text = "Cursos asignados", fontWeight = FontWeight.Bold, fontSize = 16.sp)
-        AssignedCourses(courses = listOf("Cálculo diferencial", "Química Fundamental", "Física Universitaria"))
+        // Assigned Courses
+        Text(
+            text = "Cursos Asignados",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+        AssignedCourses(courses = listOf("Cálculo Diferencial", "Química Fundamental", "Física Universitaria"))
     }
 }
 
@@ -113,7 +143,7 @@ fun UserDetailField(label: String, value: String, isPassword: Boolean = false) {
 fun ChangeOptionText(option: String) {
     Text(
         text = option,
-        color = Color(0xFF673AB7), // Texto morado
+        color = Color(0xFF673AB7),
         modifier = Modifier
             .clickable { /* Acción para cambiar */ }
             .padding(8.dp)
@@ -126,13 +156,5 @@ fun AssignedCourses(courses: List<String>) {
         courses.forEach { course ->
             Text(text = course, modifier = Modifier.padding(4.dp))
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun UserProfileScreenPreview() {
-    Proyecto1ppmTheme {
-        UserProfileScreen(navController = rememberNavController())
     }
 }
