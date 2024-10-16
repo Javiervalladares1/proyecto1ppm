@@ -31,6 +31,10 @@ import com.google.firebase.auth.FirebaseAuth
 import coil.compose.rememberAsyncImagePainter
 import com.example.proyecto1ppm.utils.getUserFullName
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.platform.LocalContext
+import com.example.proyecto1ppm.data.UserDao
+import com.example.proyecto1ppm.data.UserDatabase
+
 
 @Composable
 fun UserProfileScreen(navController: NavController) {
@@ -38,15 +42,40 @@ fun UserProfileScreen(navController: NavController) {
     var fullName by remember { mutableStateOf("") }
     var avatarUrl by remember { mutableStateOf("") }
 
-    LaunchedEffect(Unit) {
-        getUserFullName { name ->
-            fullName = name
-            if (name.isNotEmpty()) {
-                // Construct the avatar URL using the API
-                avatarUrl = "https://avatar.iran.liara.run/username?username=${name.replace(" ", "")}"
+    @Composable
+    fun UserProfileScreen(navController: NavController) {
+        val currentUser = FirebaseAuth.getInstance().currentUser
+        var fullName by remember { mutableStateOf("") }
+        var avatarUrl by remember { mutableStateOf("") }
+        val context = LocalContext.current
+
+        LaunchedEffect(Unit) {
+            // Si el usuario de Firebase no es nulo, buscamos en Room
+            currentUser?.let { user ->
+                val userDao = UserDatabase.getDatabase(context).userDao()
+                val userFromRoom = userDao.getAllUsers().find { it.email == user.email }
+                fullName = userFromRoom?.firstName ?: ""
+
+                if (fullName.isNotEmpty()) {
+                    // Generar URL de avatar
+                    avatarUrl = "https://avatar.iran.liara.run/username?username=${fullName.replace(" ", "")}"
+                } else {
+                    // Si no hay un nombre completo, pedirlo de Firebase
+                    getUserFullName { name ->
+                        fullName = name
+                        if (name.isNotEmpty()) {
+                            avatarUrl = "https://avatar.iran.liara.run/username?username=${name.replace(" ", "")}"
+                        }
+                    }
+                }
             }
         }
+
+        // Resto de la implementación de la UI
     }
+
+
+
 
     Column(
         modifier = Modifier
@@ -121,6 +150,7 @@ fun UserProfileScreen(navController: NavController) {
         AssignedCourses(courses = listOf("Cálculo Diferencial", "Química Fundamental", "Física Universitaria"))
     }
 }
+
 
 @Composable
 fun UserDetailField(label: String, value: String, isPassword: Boolean = false) {

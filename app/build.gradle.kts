@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     id("com.google.gms.google-services")
+    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
 }
 
 android {
@@ -64,7 +65,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     //<Firebase SDK dependencies>
-    implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
+    implementation(platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
     //</Firebase SDK dependencies>
@@ -75,7 +76,9 @@ dependencies {
     // Kotlin coroutines for Firebase tasks (optional)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1")
     implementation(libs.car.ui.lib)
-
+    implementation(libs.androidx.room.common)
+    implementation(libs.androidx.room.ktx)
+    implementation(libs.androidx.espresso.core)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -83,4 +86,11 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation("com.google.dagger:dagger-compiler:2.51.1")
+    ksp("com.google.dagger:dagger-compiler:2.51.1")
+    implementation("com.google.devtools.ksp:symbol-processing-api:2.0.21-1.0.25")
+
+    androidTestImplementation ("androidx.room:room-testing:2.6.1")
+    androidTestImplementation ("androidx.test.ext:junit:1.1.3")
+
 }
