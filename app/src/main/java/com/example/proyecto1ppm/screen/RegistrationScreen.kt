@@ -9,9 +9,11 @@ import com.example.proyecto1ppm.ui.theme.Proyecto1ppmTheme
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.*
@@ -21,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -62,8 +65,7 @@ fun RegistrationScreen(navController: NavController) {
         Image(
             painter = painterResource(id = R.drawable.gorro_graduacion),
             contentDescription = null,
-            modifier = Modifier
-                .size(200.dp)
+            modifier = Modifier.size(200.dp)
         )
         Text(
             text = "StudyMatch",
@@ -73,114 +75,138 @@ fun RegistrationScreen(navController: NavController) {
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // First Name Field
-        TextField(
-            value = firstName,
-            onValueChange = { firstName = it },
-            label = { Text("First Name") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
+        // Campos de texto: Nombre, Apellido, Email, Contraseña
+        TextField(value = firstName, onValueChange = { firstName = it }, label = { Text("First Name") })
         Spacer(modifier = Modifier.height(8.dp))
-
-        // Last Name Field
-        TextField(
-            value = lastName,
-            onValueChange = { lastName = it },
-            label = { Text("Last Name") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text)
-        )
+        TextField(value = lastName, onValueChange = { lastName = it }, label = { Text("Last Name") })
         Spacer(modifier = Modifier.height(8.dp))
-
-        // Email Field
-        TextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
-        )
+        TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
         Spacer(modifier = Modifier.height(8.dp))
-
-        // Password Field
-        TextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-        )
+        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Error Message
+        // Mostrar error si existe
         errorMessage?.let {
-            Text(
-                text = it,
-                color = Color.Red,
-                modifier = Modifier.padding(8.dp)
-            )
+            Text(text = it, color = Color.Red, modifier = Modifier.padding(8.dp))
         }
 
-        // Buttons for Registration and Login
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(onClick = {
-                // Register User
-                if (email.isNotEmpty() && password.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()) {
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                val user = auth.currentUser
-                                val uid = user?.uid
-
-                                val userMap = hashMapOf(
-                                    "firstName" to firstName,
-                                    "lastName" to lastName,
-                                    "email" to email
-                                )
-
-                                if (uid != null) {
-                                    db.collection("users").document(uid).set(userMap)
-                                        .addOnSuccessListener {
-                                            println("User data saved successfully")
-                                            navController.navigate("user_profile_screen")
-                                        }
-                                        .addOnFailureListener { exception ->
-                                            errorMessage = "Error saving user data: ${exception.message}"
-                                        }
-                                }
-                            } else {
-                                errorMessage = "Registration error: ${task.exception?.message}"
-                            }
-                        }
-                } else {
-                    errorMessage = "Please fill all the fields"
+        // Botón de Registro
+        Button(onClick = {
+            if (email.isNotEmpty() && password.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()) {
+                auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Lógica de registro
+                        navController.navigate("user_profile_screen")
+                    } else {
+                        errorMessage = "Error de registro: ${task.exception?.message}"
+                    }
                 }
-            }) {
-                Text("Register")
+            } else {
+                errorMessage = "Completa todos los campos"
             }
-
-            Button(onClick = {
-                // Login User
-                if (email.isNotEmpty() && password.isNotEmpty()) {
-                    auth.signInWithEmailAndPassword(email, password)
-                        .addOnCompleteListener { task ->
-                            if (task.isSuccessful) {
-                                println("Login successful with email: $email")
-                                navController.navigate("home_screen")
-                            } else {
-                                errorMessage = "Login error: ${task.exception?.message}"
-                            }
-                        }
-                } else {
-                    errorMessage = "Please fill all the fields"
-                }
-            }) {
-                Text("Login")
-            }
+        }) {
+            Text("Registrar")
         }
+
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "¿No tienes cuenta? Regístrate",
+            color = Color.White,
+            modifier = Modifier.clickable {
+                navController.navigate("LoginScreen")
+            }
+        )
+
+
     }
 }
+
+
+@Composable
+fun LoginScreen(navController: NavController) {
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    val auth = FirebaseAuth.getInstance()
+
+    Column(
+        modifier = Modifier
+            .background(Color(0xFF6A1B9A))
+            .fillMaxSize()
+            .padding(16.dp),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        // Logo and App Name
+        Image(
+            painter = painterResource(id = R.drawable.gorro_graduacion),
+            contentDescription = null,
+            modifier = Modifier.size(200.dp)
+        )
+        Text(
+            text = "StudyMatch",
+            color = Color.White,
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+
+        // Campos de texto: Email y Contraseña
+        TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
+        Spacer(modifier = Modifier.height(8.dp))
+        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+        Spacer(modifier = Modifier.height(16.dp))
+
+        // Mostrar error si existe
+        errorMessage?.let {
+            Text(text = it, color = Color.Red, modifier = Modifier.padding(8.dp))
+        }
+
+        // Botón de Inicio de Sesión
+        Button(onClick = {
+            if (email.isNotEmpty() && password.isNotEmpty()) {
+                auth.signInWithEmailAndPassword(email, password).addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        // Lógica de inicio de sesión
+                        navController.navigate("home_screen")
+                    } else {
+                        errorMessage = "Error de inicio de sesión: ${task.exception?.message}"
+                    }
+                }
+            } else {
+                errorMessage = "Completa todos los campos"
+            }
+        }) {
+            Text("Iniciar Sesión")
+        }
+
+        // Texto de navegación a pantalla de registro
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "¿No tienes cuenta? Regístrate",
+            color = Color.White,
+            modifier = Modifier.clickable {
+                navController.navigate("registration_screen")
+            }
+        )
+    }
+}
+
+
+
+@Preview(showBackground = true)
+@Composable
+fun PreviewRegistrationScreen() {
+    val navController = rememberNavController()
+    RegistrationScreen(navController = navController)
+}
+
+/*
+@Preview(showBackground = true)
+@Composable
+fun PreviewLoginScreen() {
+    val navController = rememberNavController()
+    LoginScreen(navController = navController)
+}
+*/
+

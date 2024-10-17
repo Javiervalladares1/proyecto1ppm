@@ -2,6 +2,9 @@
 
 package com.example.proyecto1ppm.screen
 
+import android.content.Context
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -22,9 +25,11 @@ import com.example.proyecto1ppm.utils.getUserFullName
 import com.google.firebase.auth.FirebaseAuth
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.res.painterResource
+import coil.request.ImageRequest
+import coil.transform.CircleCropTransformation
 
 @Composable
-fun SlideMenuScreen(navController: NavController) {
+fun SlideMenuScreen(navController: NavController, context: Context) {
     var fullName by remember { mutableStateOf("") }
     var avatarUrl by remember { mutableStateOf("") }
 
@@ -36,6 +41,8 @@ fun SlideMenuScreen(navController: NavController) {
             }
         }
     }
+
+    val isConnected = checkInternetConnection(context)
 
     Row(modifier = Modifier.fillMaxSize()) {
         // Slide Menu
@@ -78,24 +85,28 @@ fun SlideMenuScreen(navController: NavController) {
                         navController.navigate("user_profile_screen")
                     }
                 ) {
-                    if (avatarUrl.isNotEmpty()) {
-                        Image(
-                            painter = rememberAsyncImagePainter(avatarUrl),
-                            contentDescription = "User Profile",
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape)
-                        )
-                    } else {
-                        // Placeholder image
-                        Image(
-                            painter = painterResource(id = R.drawable.house),
-                            contentDescription = "User Profile",
-                            modifier = Modifier
-                                .size(50.dp)
-                                .clip(CircleShape)
-                        )
-                    }
+                    val painter = rememberAsyncImagePainter(
+                        model = if (isConnected && avatarUrl.isNotEmpty()) {
+                            ImageRequest.Builder(context)
+                                .data(avatarUrl)
+                                .size(50)
+                                .transformations(CircleCropTransformation())
+                                .build()
+                        } else {
+                            null
+                        },
+
+                        error = painterResource(R.drawable.usericon)
+                    )
+
+                    Image(
+                        painter = painter,
+                        contentDescription = "User Profile",
+                        modifier = Modifier
+                            .size(50.dp)
+                            .clip(CircleShape)
+                    )
+
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = fullName.uppercase(),
@@ -114,6 +125,14 @@ fun SlideMenuScreen(navController: NavController) {
                 .background(Color.White)
         )
     }
+}
+
+// Función para verificar la conexión a Internet
+fun checkInternetConnection(context: Context): Boolean {
+    val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    val network = connectivityManager.activeNetwork ?: return false
+    val activeNetwork = connectivityManager.getNetworkCapabilities(network) ?: return false
+    return activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
 }
 
 @Composable
