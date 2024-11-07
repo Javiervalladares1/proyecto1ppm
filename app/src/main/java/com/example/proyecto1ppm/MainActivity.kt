@@ -1,5 +1,3 @@
-
-
 package com.example.proyecto1ppm
 
 import android.os.Bundle
@@ -10,22 +8,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.proyecto1ppm.screen.GroupDetailsScreen
-import com.example.proyecto1ppm.screen.GroupMembersScreen
-import com.example.proyecto1ppm.screen.HomeScreen
-import com.example.proyecto1ppm.screen.LoginScreen
-import com.example.proyecto1ppm.screen.RegistrationScreen
-import com.example.proyecto1ppm.screen.SlideMenuScreen
-import com.example.proyecto1ppm.screen.SplashScreen
-import com.example.proyecto1ppm.screen.UserProfileScreen
+import com.example.proyecto1ppm.screen.*
 import com.example.proyecto1ppm.ui.theme.Proyecto1ppmTheme
 import java.net.URLDecoder
+import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import androidx.navigation.NavType
 
 import androidx.navigation.navArgument
-import com.example.proyecto1ppm.screen.ChatScreen
-
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +31,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun AppNavigation() {
     val navController = rememberNavController()
-    val context= LocalContext.current
+    val context = LocalContext.current
     NavHost(navController = navController, startDestination = "splash_screen") {
         // Splash Screen
         composable("splash_screen") {
@@ -51,7 +41,7 @@ fun AppNavigation() {
         composable("registration_screen") {
             RegistrationScreen(navController = navController)
         }
-        composable("LoginScreen"){
+        composable("LoginScreen") {
             LoginScreen(navController = navController)
         }
         // Home Screen
@@ -70,8 +60,7 @@ fun AppNavigation() {
         composable("slide_menu_screen") {
             SlideMenuScreen(navController = navController, context = context)
         }
-        // En tu función AppNavigation(), agrega la nueva ruta:
-
+        // Ruta para GroupMembersScreen
         composable(
             "group_members_screen/{courseId}",
             arguments = listOf(navArgument("courseId") { type = NavType.StringType })
@@ -80,14 +69,23 @@ fun AppNavigation() {
             val courseId = URLDecoder.decode(encodedCourseId, StandardCharsets.UTF_8.toString())
             GroupMembersScreen(navController = navController, courseId = courseId)
         }
+        // Ruta para CourseDetailScreen
+        composable(
+            "course_detail_screen/{courseId}",
+            arguments = listOf(navArgument("courseId") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val encodedCourseId = backStackEntry.arguments?.getString("courseId") ?: ""
+            val courseId = URLDecoder.decode(encodedCourseId, StandardCharsets.UTF_8.toString())
+            CourseDetailScreen(navController = navController, courseId = courseId)
+        }
+        // Ruta para ChatScreen
         composable(
             "chat_screen/{courseId}",
             arguments = listOf(navArgument("courseId") { type = NavType.StringType })
         ) { backStackEntry ->
-            val courseId = backStackEntry.arguments?.getString("courseId") ?: ""
+            val encodedCourseId = backStackEntry.arguments?.getString("courseId") ?: ""
+            val courseId = URLDecoder.decode(encodedCourseId, StandardCharsets.UTF_8.toString())
             ChatScreen(navController = navController, courseId = courseId)
         }
-
-
     }
 }

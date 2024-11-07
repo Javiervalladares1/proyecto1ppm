@@ -1,16 +1,12 @@
 package com.example.proyecto1ppm.screen
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
+import androidx.compose.runtime.*
+import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -18,21 +14,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
-import com.example.proyecto1ppm.R
-
-
-
-import androidx.compose.runtime.*
-
 import com.example.proyecto1ppm.data.CourseRepository
 import com.example.proyecto1ppm.data.Course
-
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @Composable
 fun GroupDetailsScreen(navController: NavController) {
@@ -148,7 +137,11 @@ fun GroupDetailsScreen(navController: NavController) {
                     Button(
                         onClick = {
                             // Navegar al Chat
-                            navController.navigate("chat_screen/${course.id}")
+                            val encodedCourseId = URLEncoder.encode(
+                                course.id,
+                                StandardCharsets.UTF_8.toString()
+                            )
+                            navController.navigate("chat_screen/$encodedCourseId")
                         }
                     ) {
                         Text("Chat")
