@@ -10,19 +10,19 @@ object CourseRepository {
             id = "course_calculus",
             title = "Cálculo",
             description = "Este curso cubre los conceptos fundamentales del cálculo diferencial e integral.",
-            imageRes = R.drawable.house // Replace with your actual image resource
+            imageRes = R.drawable.calculo // Replace with your actual image resource
         ),
         Course(
             id = "course_physics",
             title = "Física",
-            description = "Explora las leyes fundamentales que gobiernan el universo.",
-            imageRes = R.drawable.house
+            description = "Curso de Física con énfasis en mecánica y electromagnetismo.",
+            imageRes = R.drawable.fisica
         ),
         Course(
             id = "course_chemistry",
             title = "Química",
-            description = "Aprende sobre la composición, estructura y propiedades de la materia.",
-            imageRes = R.drawable.house
+            description = "Curso de Química donde se estudian reacciones y compuestos.",
+            imageRes = R.drawable.quimica
         )
         // Add more courses as needed
     )

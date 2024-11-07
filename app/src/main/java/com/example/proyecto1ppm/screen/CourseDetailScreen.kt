@@ -122,5 +122,8 @@ fun CourseDetailScreen(navController: NavController, courseId: String) {
         }
 
         Spacer(modifier = Modifier.height(24.dp))
+
+
     }
+
 }

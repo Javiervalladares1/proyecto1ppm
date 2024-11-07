@@ -391,8 +391,7 @@ fun GroupItem(course: Course, navController: NavController, userId: String?) {
                             db.collection("groups").document(course.id)
                                 .update("members", FieldValue.arrayRemove(userId))
                                 .addOnSuccessListener {
-                                    // Actualizar la lista de grupos
-                                    // Aquí puedes implementar la lógica para actualizar la lista localmente
+
                                 }
                         }
                     },
