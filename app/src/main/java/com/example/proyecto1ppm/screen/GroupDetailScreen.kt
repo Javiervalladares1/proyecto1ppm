@@ -23,8 +23,49 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto1ppm.R
 
+
+
+import androidx.compose.runtime.*
+
+import com.example.proyecto1ppm.data.CourseRepository
+import com.example.proyecto1ppm.data.Course
+
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
+
 @Composable
 fun GroupDetailsScreen(navController: NavController) {
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
+    val userId = auth.currentUser?.uid
+
+    var userGroups by remember { mutableStateOf<List<String>>(emptyList()) }
+    var coursesInGroups by remember { mutableStateOf<List<Course>>(emptyList()) }
+
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            // Obtener grupos donde el usuario es miembro
+            db.collection("groups")
+                .whereArrayContains("members", userId)
+                .get()
+                .addOnSuccessListener { querySnapshot ->
+                    val groupIds = querySnapshot.documents.map { it.id }
+                    userGroups = groupIds
+
+                    // Obtener información de los cursos correspondientes
+                    val courses = groupIds.mapNotNull { groupId ->
+                        // Suponiendo que groupId corresponde a courseId
+                        CourseRepository.courses.find { it.id == groupId }
+                    }
+                    coursesInGroups = courses
+                }
+                .addOnFailureListener { e ->
+                    println("Error al obtener los grupos del usuario: ${e.message}")
+                }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -38,11 +79,11 @@ fun GroupDetailsScreen(navController: NavController) {
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
-                contentDescription = "Back",
+                contentDescription = "Atrás",
                 modifier = Modifier.clickable { navController.navigate("home_screen") }
             )
             Text(
-                text = "Curso de Ejemplo",
+                text = "Mis Grupos",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.fillMaxWidth(),
@@ -52,123 +93,96 @@ fun GroupDetailsScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Imagen de portada del grupo
-        Image(
-            painter = painterResource(R.drawable.house), // Imagen genérica
-            contentDescription = "Imagen del Curso",
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(200.dp)
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Descripción del grupo
-        Text(
-            text = "Descripción",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = "Esta es una descripción genérica para el curso de ejemplo.",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Normal,
-            textAlign = TextAlign.Justify
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Sección de Temas Abordados
-        Text(
-            text = "Temas Abordados",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        Column {
-            listOf("Tema 1", "Tema 2", "Tema 3").forEach { topic ->
-                Text(text = "- $topic", fontSize = 16.sp)
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Apartado de reuniones de Zoom
-        Text(
-            text = "Reuniones",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-        Text(
-            text = "Reuniones por Zoom: Miércoles a las 5:00 PM",
-            fontSize = 16.sp
-        )
-        Text(
-            text = "Enlace de la reunión: https://zoom.us/j/1234567890",
-            fontSize = 16.sp,
-            color = Color.Blue
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Primera fila de botones de acción
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
-        ) {
-            Button(onClick = { /* Enviar mensaje */ }) {
-                Text("Enviar Mensaje")
-            }
-            Button(onClick = { /* Agregar miembro */ }) {
-                Text("Agregar Miembro")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Segunda fila: Botón de "Salir del Grupo" en una fila aparte
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center // Centramos el botón rojo
-        ) {
-            Button(
-                onClick = { /* Salir del grupo */ },
-                colors = ButtonDefaults.buttonColors(Color.Red)
-            ) {
-                Text("Salir del Grupo")
-            }
-        }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Mensajes recientes o publicaciones
-        Text(
-            text = "Mensajes Recientes",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.SemiBold
-        )
-
-        // Placeholder para mensajes recientes
-        Column {
-            repeat(3) { index ->
-                Card(
+        if (coursesInGroups.isNotEmpty()) {
+            coursesInGroups.forEach { course ->
+                // Imagen del curso
+                Image(
+                    painter = painterResource(course.imageRes),
+                    contentDescription = "Imagen del Curso",
+                    contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp)
+                        .height(200.dp)
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Descripción del curso
+                Text(
+                    text = course.title,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = course.description,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Normal,
+                    textAlign = TextAlign.Justify
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Sección de Reuniones
+                Text(
+                    text = "Reuniones",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Text(
+                    text = "Reuniones por Zoom: Miércoles a las 5:00 PM",
+                    fontSize = 16.sp
+                )
+                Text(
+                    text = "Enlace de la reunión: https://zoom.us/j/1234567890",
+                    fontSize = 16.sp,
+                    color = Color.Blue
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Botones de acción
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Usuario $index", fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        Text("Este es un mensaje reciente en el grupo.")
+                    Button(
+                        onClick = {
+                            // Navegar al Chat
+                            navController.navigate("chat_screen/${course.id}")
+                        }
+                    ) {
+                        Text("Chat")
+                    }
+                    Button(
+                        onClick = {
+                            // Salir del grupo
+                            if (userId != null) {
+                                db.collection("groups").document(course.id)
+                                    .update("members", FieldValue.arrayRemove(userId))
+                                    .addOnSuccessListener {
+                                        // Usuario removido del grupo
+                                        // Actualizar listas locales
+                                        userGroups = userGroups - course.id
+                                        coursesInGroups = coursesInGroups.filter { it.id != course.id }
+                                    }
+                            }
+                        },
+                        colors = ButtonDefaults.buttonColors(Color.Red)
+                    ) {
+                        Text("Salir del Grupo")
                     }
                 }
+
+                Spacer(modifier = Modifier.height(24.dp))
             }
+        } else {
+            Text(
+                text = "No estás en ningún grupo.",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewGroupDetailsScreen() {
-    GroupDetailsScreen(navController = rememberNavController() )
 }

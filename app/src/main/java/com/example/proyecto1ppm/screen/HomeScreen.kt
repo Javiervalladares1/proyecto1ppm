@@ -23,18 +23,26 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.proyecto1ppm.R
+import com.example.proyecto1ppm.data.Course
+import com.example.proyecto1ppm.data.CourseRepository
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import androidx.compose.foundation.*
 
-data class Group(
-    val title: String,
-    val description: String,
-    val image: Int,
-    val members: List<Int>, // Image resource ids for member avatars
-    val topics: List<String>
-)
+import androidx.compose.foundation.lazy.items
+
+import androidx.compose.ui.*
+import com.google.firebase.firestore.FieldValue
+import java.net.URLEncoder
+import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
+    val courses = CourseRepository.courses
+    var selectedCourse by remember { mutableStateOf<Course?>(null) }
+    val auth = FirebaseAuth.getInstance()
+    val db = FirebaseFirestore.getInstance()
 
     Column(modifier = Modifier.fillMaxSize()) {
         // Top Bar
@@ -43,7 +51,7 @@ fun HomeScreen(navController: NavController) {
                 Text("SUGERENCIA DE CURSOS", modifier = Modifier.fillMaxWidth(), textAlign = TextAlign.Center)
             },
             navigationIcon = {
-                IconButton(onClick = {  navController.navigate("slide_menu_screen") }) {
+                IconButton(onClick = { navController.navigate("slide_menu_screen") }) {
                     Icon(Icons.Default.Menu, contentDescription = "Menu")
                 }
             },
@@ -54,7 +62,7 @@ fun HomeScreen(navController: NavController) {
             }
         )
 
-        // Tabs: Cursos, Grupos, Sugerencias
+        // Tabs
         TabRow(selectedTabIndex = 0, modifier = Modifier.fillMaxWidth()) {
             Tab(
                 selected = true,
@@ -64,7 +72,8 @@ fun HomeScreen(navController: NavController) {
             Tab(
                 selected = false,
                 onClick = {
-                    navController.navigate("group_detail_screen") },
+                    navController.navigate("group_detail_screen")
+                },
                 text = { Text("Grupos") }
             )
             Tab(
@@ -76,85 +85,106 @@ fun HomeScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        // Carrusel de Cursos (sin datos, solo placeholder)
+        // Carrusel de Cursos
         LazyRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 8.dp),
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            items(3) { // Simulamos 3 items de ejemplo
+            items(courses) { course ->
                 Image(
-                    painter = painterResource(R.drawable.house), // Imagen genérica
-                    contentDescription = "Curso",
+                    painter = painterResource(course.imageRes),
+                    contentDescription = course.title,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .size(180.dp)
                         .clip(MaterialTheme.shapes.medium)
+                        .clickable {
+                            selectedCourse = course
+                        }
                 )
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Información del Curso (placeholder)
-        Text(
-            text = "Cálculo",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
+        // Información del Curso seleccionado
+        if (selectedCourse != null) {
+            Text(
+                text = selectedCourse!!.title,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
 
-        Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(8.dp))
 
-        // Sección de Avatares y Botones "Join Group" y "Create New Group" (sin lógica)
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp),
-            horizontalArrangement = Arrangement.SpaceAround,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                LazyRow {
-                    items(3) { // Simulamos 3 avatares de ejemplo
-                        Image(
-                            painter = painterResource(R.drawable.house),
-                            contentDescription = "Member Avatar",
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(CircleShape)
-                                .padding(4.dp)
-                        )
+            // Botones "Join Group" y "Ver Grupo"
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp),
+                horizontalArrangement = Arrangement.SpaceAround,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Button(onClick = {
+                    // Acción para unirse al grupo
+                    val userId = auth.currentUser?.uid
+                    val groupId = selectedCourse!!.id
+                    if (userId != null) {
+                        db.collection("groups").document(groupId)
+                            .update("members", FieldValue.arrayUnion(userId))
+                            .addOnSuccessListener {
+                                // Usuario añadido al grupo
+                            }
+                            .addOnFailureListener { e ->
+                                // Si el grupo no existe, lo creamos
+                                val groupData = hashMapOf(
+                                    "courseId" to groupId,
+                                    "members" to listOf(userId)
+                                )
+                                db.collection("groups").document(groupId)
+                                    .set(groupData)
+                                    .addOnSuccessListener {
+                                        // Grupo creado y usuario añadido
+                                    }
+                            }
                     }
+                }) {
+                    Text("Unirse al Grupo")
                 }
 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Icon(painterResource(R.drawable.house), contentDescription = "Join Group", modifier = Modifier.size(24.dp))
-                    Text("Join group", color = Color.Blue, fontSize = 14.sp)
+                Button(onClick = {
+                    // Navegar a la nueva pantalla de miembros del grupo
+                    val encodedCourseId = URLEncoder.encode(selectedCourse!!.id, StandardCharsets.UTF_8.toString())
+                    navController.navigate("group_members_screen/$encodedCourseId")
+                }) {
+                    Text("Ver Grupo")
                 }
             }
 
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Icon(painterResource(R.drawable.house), contentDescription = "Create New Group", modifier = Modifier.size(24.dp))
-                Text("Create new group", color = Color.Blue, fontSize = 14.sp)
-            }
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Descripción del Curso
+            Text(
+                text = selectedCourse!!.description,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+        } else {
+            // Mostrar un mensaje o un curso por defecto
+            Text(
+                text = "Seleccione un curso para ver más detalles.",
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Descripción del Curso (placeholder)
-        Text(
-            text = "Esta es una descripción del curso de ejemplo.",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Normal,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
     }
 }
 

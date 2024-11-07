@@ -2,7 +2,7 @@
   "project_info": {
     "project_number": "136512183889",
     "project_id": "proyecto-ppm-studymatch",
-    "storage_bucket": "proyecto-ppm-studymatch.appspot.com"
+    "storage_bucket": "proyecto-ppm-studymatch.firebasestorage.app"
   },
   "client": [
     {

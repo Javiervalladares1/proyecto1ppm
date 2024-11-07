@@ -95,9 +95,26 @@ fun RegistrationScreen(navController: NavController) {
             if (email.isNotEmpty() && password.isNotEmpty() && firstName.isNotEmpty() && lastName.isNotEmpty()) {
                 auth.createUserWithEmailAndPassword(email, password).addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        // Lógica de registro
-                        navController.navigate("user_profile_screen")
-                    } else {
+                        val user = auth.currentUser
+                        val uid = user?.uid
+
+                        val userMap = hashMapOf(
+                            "firstName" to firstName,
+                            "lastName" to lastName,
+                            "email" to email
+                        )
+
+                        if (uid != null) {
+                            db.collection("users").document(uid).set(userMap)
+                                .addOnSuccessListener {
+                                    println("User data saved successfully")
+                                    navController.navigate("user_profile_screen")
+                                }
+                                .addOnFailureListener { exception ->
+                                    errorMessage = "Error saving user data: ${exception.message}"
+                                }
+                        }
+                    }  else {
                         errorMessage = "Error de registro: ${task.exception?.message}"
                     }
                 }
@@ -110,7 +127,7 @@ fun RegistrationScreen(navController: NavController) {
 
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "¿No tienes cuenta? Regístrate",
+            text = "¿Ya tienes cuenta? Inicia Sesión",
             color = Color.White,
             modifier = Modifier.clickable {
                 navController.navigate("LoginScreen")
