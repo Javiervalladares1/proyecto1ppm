@@ -1,6 +1,5 @@
 package com.example.proyecto1ppm.screen
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,14 +14,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+// Eliminamos importación de painterResource
+// import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyecto1ppm.data.*
+import com.example.proyecto1ppm.data.Course
+import com.example.proyecto1ppm.data.Suggestion
+import com.example.proyecto1ppm.data.SuggestionRepository
+import com.example.proyecto1ppm.data.SuggestionType
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
@@ -31,10 +34,13 @@ import kotlinx.coroutines.launch
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
+// Importamos Coil
+import coil.compose.AsyncImage
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(navController: NavController) {
-    val courses = CourseRepository.courses
+    var courses by remember { mutableStateOf<List<Course>>(emptyList()) }
     var selectedCourse by remember { mutableStateOf<Course?>(null) }
     val auth = FirebaseAuth.getInstance()
     val db = FirebaseFirestore.getInstance()
@@ -42,6 +48,21 @@ fun HomeScreen(navController: NavController) {
     val coroutineScope = rememberCoroutineScope()
 
     var selectedTabIndex by remember { mutableStateOf(0) }
+
+    // Cargar cursos desde Firestore
+    LaunchedEffect(Unit) {
+        db.collection("courses")
+            .get()
+            .addOnSuccessListener { result ->
+                val loadedCourses = result.map { document ->
+                    document.toObject(Course::class.java)
+                }
+                courses = loadedCourses
+            }
+            .addOnFailureListener { exception ->
+                println("Error al obtener cursos: ${exception.message}")
+            }
+    }
 
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
@@ -140,8 +161,8 @@ fun CourseCarousel(
     ) {
         items(courses.size) { index ->
             val course = courses[index]
-            Image(
-                painter = painterResource(course.imageRes),
+            AsyncImage(
+                model = course.imageUrl,
                 contentDescription = course.title,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -281,12 +302,21 @@ fun GroupList(navController: NavController) {
                     val groupIds = querySnapshot.documents.map { it.id }
                     userGroups = groupIds
 
-                    // Obtener información de los cursos correspondientes
-                    val courses = groupIds.mapNotNull { groupId ->
-                        // Suponiendo que groupId corresponde a courseId
-                        CourseRepository.courses.find { it.id == groupId }
+                    // Obtener información de los cursos correspondientes desde Firestore
+                    if (groupIds.isNotEmpty()) {
+                        db.collection("courses")
+                            .whereIn("id", groupIds)
+                            .get()
+                            .addOnSuccessListener { coursesSnapshot ->
+                                val courses = coursesSnapshot.documents.mapNotNull { it.toObject(Course::class.java) }
+                                coursesInGroups = courses
+                            }
+                            .addOnFailureListener { e ->
+                                println("Error al obtener los cursos: ${e.message}")
+                            }
+                    } else {
+                        coursesInGroups = emptyList()
                     }
-                    coursesInGroups = courses
                 }
                 .addOnFailureListener { e ->
                     println("Error al obtener los grupos del usuario: ${e.message}")
@@ -333,8 +363,8 @@ fun GroupItem(course: Course, navController: NavController, userId: String?) {
     ) {
         Column {
             // Imagen del curso
-            Image(
-                painter = painterResource(course.imageRes),
+            AsyncImage(
+                model = course.imageUrl,
                 contentDescription = "Imagen del Curso",
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -391,7 +421,7 @@ fun GroupItem(course: Course, navController: NavController, userId: String?) {
                             db.collection("groups").document(course.id)
                                 .update("members", FieldValue.arrayRemove(userId))
                                 .addOnSuccessListener {
-
+                                    // Opcional: Actualizar la lista localmente
                                 }
                         }
                     },

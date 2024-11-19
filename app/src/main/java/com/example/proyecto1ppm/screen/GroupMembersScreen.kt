@@ -1,4 +1,5 @@
 package com.example.proyecto1ppm.screen
+
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material3.*
@@ -11,7 +12,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyecto1ppm.data.CourseRepository
+import com.example.proyecto1ppm.data.Course
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.compose.foundation.*
@@ -20,7 +21,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.filled.ArrowBack
 import com.google.firebase.firestore.FieldValue
 import androidx.compose.runtime.mutableStateMapOf
-
 
 @Composable
 fun GroupMembersScreen(navController: NavController, courseId: String) {
@@ -32,14 +32,31 @@ fun GroupMembersScreen(navController: NavController, courseId: String) {
         return
     }
 
-    val course = CourseRepository.courses.find { it.id == courseId }
     val db = FirebaseFirestore.getInstance()
     val auth = FirebaseAuth.getInstance()
     val userId = auth.currentUser?.uid
 
+    var course by remember { mutableStateOf<Course?>(null) }
     var members by remember { mutableStateOf<List<String>>(emptyList()) }
     val userNames = remember { mutableStateMapOf<String, String>() }
 
+    // Obtener el curso desde Firestore
+    LaunchedEffect(courseId) {
+        db.collection("courses").document(courseId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    course = document.toObject(Course::class.java)
+                } else {
+                    println("El documento del curso no existe.")
+                }
+            }
+            .addOnFailureListener { exception ->
+                println("Error al obtener el curso: ${exception.message}")
+            }
+    }
+
+    // Obtener los miembros del grupo
     LaunchedEffect(courseId) {
         try {
             db.collection("groups").document(courseId).addSnapshotListener { snapshot, error ->
@@ -92,7 +109,7 @@ fun GroupMembersScreen(navController: NavController, courseId: String) {
             ) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = "Atrás",
                     modifier = Modifier.clickable { navController.popBackStack() }
                 )
                 Text(
@@ -144,7 +161,7 @@ fun GroupMembersScreen(navController: NavController, courseId: String) {
                             }
                     }
                 },
-                colors = ButtonDefaults.buttonColors(Color.Red),
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Salir del Grupo")
@@ -152,4 +169,3 @@ fun GroupMembersScreen(navController: NavController, courseId: String) {
         }
     }
 }
-

@@ -66,7 +66,7 @@ fun SlideMenuScreen(navController: NavController, context: Context) {
                     MenuItem(text = "GRUPOS", onClick = {
                         navController.navigate("group_detail_screen")
                     })
-                    MenuItem(text = "SUGERENCIAS", onClick = { /* Acción */ })
+                    MenuItem(text = "SUGERENCIAS", onClick = {  })
                     MenuItem(text = "AJUSTES", onClick = {
                         navController.navigate("user_profile_screen")
                     })
