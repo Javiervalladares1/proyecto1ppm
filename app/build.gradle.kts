@@ -67,7 +67,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:32.6.0"))
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-firestore")
-    //</Firebase SDK dependencies>
+    implementation("com.google.accompanist:accompanist-permissions:0.31.2-alpha")
 
     // Coil for image loading
     implementation("io.coil-kt:coil-compose:2.4.0")

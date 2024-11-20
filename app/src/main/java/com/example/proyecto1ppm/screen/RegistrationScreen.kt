@@ -213,19 +213,6 @@ fun LoginScreen(navController: NavController) {
 
 
 
-@Preview(showBackground = true)
-@Composable
-fun PreviewRegistrationScreen() {
-    val navController = rememberNavController()
-    RegistrationScreen(navController = navController)
-}
 
-/*
-@Preview(showBackground = true)
-@Composable
-fun PreviewLoginScreen() {
-    val navController = rememberNavController()
-    LoginScreen(navController = navController)
-}
-*/
+
 
