@@ -9,13 +9,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyecto1ppm.data.CourseRepository
 import com.example.proyecto1ppm.data.Course
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
@@ -42,12 +41,21 @@ fun GroupDetailsScreen(navController: NavController) {
                     val groupIds = querySnapshot.documents.map { it.id }
                     userGroups = groupIds
 
-                    // Obtener información de los cursos correspondientes
-                    val courses = groupIds.mapNotNull { groupId ->
-                        // Suponiendo que groupId corresponde a courseId
-                        CourseRepository.courses.find { it.id == groupId }
+                    // Obtener información de los cursos correspondientes desde Firestore
+                    if (groupIds.isNotEmpty()) {
+                        db.collection("courses")
+                            .whereIn("id", groupIds)
+                            .get()
+                            .addOnSuccessListener { coursesSnapshot ->
+                                val courses = coursesSnapshot.documents.mapNotNull { it.toObject(Course::class.java) }
+                                coursesInGroups = courses
+                            }
+                            .addOnFailureListener { e ->
+                                println("Error al obtener los cursos: ${e.message}")
+                            }
+                    } else {
+                        coursesInGroups = emptyList()
                     }
-                    coursesInGroups = courses
                 }
                 .addOnFailureListener { e ->
                     println("Error al obtener los grupos del usuario: ${e.message}")
@@ -84,9 +92,9 @@ fun GroupDetailsScreen(navController: NavController) {
 
         if (coursesInGroups.isNotEmpty()) {
             coursesInGroups.forEach { course ->
-                // Imagen del curso
-                Image(
-                    painter = painterResource(course.imageRes),
+                // Imagen del curso usando AsyncImage de Coil
+                AsyncImage(
+                    model = course.imageUrl,
                     contentDescription = "Imagen del Curso",
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
@@ -160,7 +168,7 @@ fun GroupDetailsScreen(navController: NavController) {
                                     }
                             }
                         },
-                        colors = ButtonDefaults.buttonColors(Color.Red)
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
                     ) {
                         Text("Salir del Grupo")
                     }

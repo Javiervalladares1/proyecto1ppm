@@ -5,24 +5,41 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.*
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
+import coil.compose.AsyncImage
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import com.example.proyecto1ppm.data.CourseRepository
-import com.example.proyecto1ppm.R
+import com.example.proyecto1ppm.data.Course
+import com.google.firebase.firestore.FirebaseFirestore
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @Composable
 fun CourseDetailScreen(navController: NavController, courseId: String) {
-    val course = CourseRepository.courses.find { it.id == courseId }
+    val db = FirebaseFirestore.getInstance()
+    var course by remember { mutableStateOf<Course?>(null) }
+
+    // Obtener el curso desde Firestore
+    LaunchedEffect(courseId) {
+        db.collection("courses").document(courseId)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document != null && document.exists()) {
+                    course = document.toObject(Course::class.java)
+                } else {
+                    println("El documento no existe")
+                }
+            }
+            .addOnFailureListener { exception ->
+                println("Error al obtener el documento: ${exception.message}")
+            }
+    }
 
     Column(
         modifier = Modifier
@@ -51,9 +68,9 @@ fun CourseDetailScreen(navController: NavController, courseId: String) {
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Imagen del curso
-        Image(
-            painter = painterResource(course?.imageRes ?: R.drawable.house),
+        // Imagen del curso usando AsyncImage de Coil
+        AsyncImage(
+            model = course?.imageUrl ?: "",
             contentDescription = "Imagen del Curso",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -115,15 +132,12 @@ fun CourseDetailScreen(navController: NavController, courseId: String) {
                     // Salir del grupo
                     // Lógica para salir del grupo
                 },
-                colors = ButtonDefaults.buttonColors(Color.Red)
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Red)
             ) {
                 Text("Salir del Grupo")
             }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
-
-
     }
-
 }

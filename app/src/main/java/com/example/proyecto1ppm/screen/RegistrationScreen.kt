@@ -31,6 +31,8 @@ import com.example.proyecto1ppm.R
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import androidx.navigation.compose.rememberNavController
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+
 
 class RegistrationActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,7 +84,7 @@ fun RegistrationScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(8.dp))
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, visualTransformation = PasswordVisualTransformation())
         Spacer(modifier = Modifier.height(16.dp))
 
         // Mostrar error si existe
@@ -115,7 +117,7 @@ fun RegistrationScreen(navController: NavController) {
                                 }
                         }
                     }  else {
-                        errorMessage = "Error de registro: ${task.exception?.message}"
+                        errorMessage = "Comprueba que tus credenciales sean correctas"
                     }
                 }
             } else {
@@ -171,7 +173,7 @@ fun LoginScreen(navController: NavController) {
         // Campos de texto: Email y Contraseña
         TextField(value = email, onValueChange = { email = it }, label = { Text("Email") })
         Spacer(modifier = Modifier.height(8.dp))
-        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") })
+        TextField(value = password, onValueChange = { password = it }, label = { Text("Password") }, visualTransformation = PasswordVisualTransformation())
         Spacer(modifier = Modifier.height(16.dp))
 
         // Mostrar error si existe
@@ -187,7 +189,7 @@ fun LoginScreen(navController: NavController) {
                         // Lógica de inicio de sesión
                         navController.navigate("home_screen")
                     } else {
-                        errorMessage = "Error de inicio de sesión: ${task.exception?.message}"
+                        errorMessage = "Verifica que tus credenciales sean correctas"
                     }
                 }
             } else {

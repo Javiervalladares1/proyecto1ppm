@@ -1,6 +1,6 @@
-// In the same file or a new file CourseRepository.kt
+package com.example.proyecto1ppm.data// In the same file or a new file CourseRepository.kt
 
-package com.example.proyecto1ppm.data
+/*package com.example.proyecto1ppm.data
 
 import com.example.proyecto1ppm.R
 
@@ -27,3 +27,4 @@ object CourseRepository {
         // Add more courses as needed
     )
 }
+*/

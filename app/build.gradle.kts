@@ -75,6 +75,7 @@ dependencies {
     // Kotlin coroutines for Firebase tasks (optional)
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.1")
     implementation(libs.car.ui.lib)
+    implementation(libs.play.services.location)
 
 
     testImplementation(libs.junit)
@@ -84,4 +85,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+    implementation(libs.accompanist.permissions)
+
 }
